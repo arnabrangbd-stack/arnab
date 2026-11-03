@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0d1a">
+<title>খেলাঘর — বন্ধুদের গেম হাব</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎲%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0d1a;--panel:rgba(255,255,255,.07);--panel2:rgba(255,255,255,.13);--line:rgba(255,255,255,.12);--text:#f4f5ff;--muted:#a9adc9;--c1:#7c5cff;--c2:#00d4ff;--good:#3ddc97;--bad:#ff5470;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Hind Siliguri','Noto Sans Bengali','Kalpurush','Siyam Rupali',system-ui,sans-serif;line-height:1.5}
+body{overflow-x:hidden;-webkit-user-select:none;user-select:none}
+input{-webkit-user-select:text;user-select:text}
+button{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(circle at 20% 0,#1a1646 0,transparent 55%),var(--bg)}
+.blob{position:absolute;width:60vmax;height:60vmax;border-radius:50%;filter:blur(90px);opacity:.28;animation:float 20s ease-in-out infinite alternate}
+.blob.a{background:#7c5cff;left:-20vmax;top:-20vmax}.blob.b{background:#00c2ff;right:-25vmax;top:30vh;animation-delay:-6s}.blob.c{background:#ff5f6d;left:10vmax;bottom:-30vmax;animation-delay:-12s}
+@keyframes float{to{transform:translate(8vmax,6vmax) scale(1.15)}}
+/* HOME */
+#home{max-width:1000px;margin:0 auto;padding:36px 16px 60px}
+.hero{text-align:center;margin-bottom:28px}
+.hero h1{font-size:clamp(2.2rem,8vw,3.6rem);font-weight:700;background:linear-gradient(90deg,#fff,#b9a8ff,#6fe3ff,#fff);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
+@keyframes shine{to{background-position:-250% 0}}
+.logo{font-size:54px;line-height:1;animation:pop .9s cubic-bezier(.3,1.6,.4,1) both}
+.hero p{color:var(--muted);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px}
+.gcard{--rx:0deg;--ry:0deg;position:relative;border:0;text-align:left;border-radius:24px;padding:18px;min-height:190px;background:linear-gradient(145deg,var(--c1),var(--c2));cursor:pointer;overflow:hidden;display:flex;flex-direction:column;gap:4px;box-shadow:0 14px 40px -12px var(--c1);transform:perspective(700px) rotateX(var(--rx)) rotateY(var(--ry));transition:transform .2s ease-out,box-shadow .3s;animation:cardin .7s cubic-bezier(.2,.9,.2,1) both;animation-delay:calc(var(--i)*70ms)}
+.gcard:hover{box-shadow:0 22px 50px -10px var(--c1)}
+.gcard::after{content:"";position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.16)}
+@keyframes cardin{from{opacity:0;transform:translateY(30px) scale(.9)}}
+.cicon{font-size:50px;line-height:1;width:64px;height:64px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 6px 8px rgba(0,0,0,.25))}
+.gcard h3{font-size:1.25rem;font-weight:700;margin-top:auto;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.25)}
+.gcard p{font-size:.84rem;color:rgba(255,255,255,.88);line-height:1.35}
+.gcard .pl{align-self:flex-start;font-size:.75rem;background:rgba(0,0,0,.25);border-radius:99px;padding:2px 10px;margin-top:6px;color:#fff}
+.foot{text-align:center;color:var(--muted);font-size:.85rem;margin-top:34px}
+/* GAME SCREEN */
+#game{display:none;min-height:100dvh;opacity:0}
+#game.on{display:block}
+#game.show{opacity:1;transition:opacity .35s}
+.ghead{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:12px 14px;padding-top:max(12px,env(safe-area-inset-top));background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.ghead h2{font-size:1.25rem;font-weight:700;flex:1;color:#fff}
+.ib{width:42px;height:42px;border:0;border-radius:14px;background:rgba(0,0,0,.22);color:#fff;font-size:1.2rem;cursor:pointer;transition:transform .2s,background .2s}
+.ib:hover{background:rgba(0,0,0,.35)}.ib:active{transform:scale(.9)}
+#gicon{font-size:30px;width:42px;height:42px;display:flex;align-items:center;justify-content:center}
+#gbody{max-width:560px;margin:0 auto;padding:18px 16px 70px}
+html.novt #gbody>*{animation:fadeup .45s cubic-bezier(.2,.9,.2,1) both}
+@keyframes fadeup{from{opacity:0;transform:translateY(18px) scale(.97)}}
+#gbody.enter>*{animation:fadeup .5s cubic-bezier(.2,.9,.2,1) both}
+::view-transition-old(root){animation:vtout .2s ease both}
+::view-transition-new(root){animation:vtin .38s cubic-bezier(.2,.9,.2,1) both}
+::view-transition-group(pcard){animation-duration:.5s;animation-timing-function:cubic-bezier(.3,1.15,.4,1)}
+@keyframes vtout{to{opacity:0;transform:scale(.98)}}
+@keyframes vtin{from{opacity:0;transform:translateY(14px) scale(1.02)}}
+.stack{display:flex;flex-direction:column;gap:14px}
+.center{text-align:center;align-items:center}
+.muted{color:var(--muted)}
+.row{display:flex;gap:10px;width:100%;flex-wrap:wrap}.row>*{flex:1}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:10px;width:100%}
+.lbl{font-size:.85rem;color:var(--muted);font-weight:600;letter-spacing:.2px}
+.btn{border:0;border-radius:16px;padding:13px 20px;font-weight:600;color:#fff;background:linear-gradient(135deg,var(--c1),var(--c2));cursor:pointer;transition:transform .15s,opacity .2s,filter .2s;box-shadow:0 10px 24px -10px var(--c1)}
+.btn:hover{filter:brightness(1.1)}.btn:active{transform:scale(.96)}
+.btn.ghost{background:var(--panel2);box-shadow:none}
+.btn.big{width:100%;padding:17px;font-size:1.1rem}
+.btn:disabled{opacity:.35;pointer-events:none}
+h1.glow{font-size:2rem;text-shadow:0 0 30px var(--c1)}
+.pill{background:var(--panel2);border-radius:99px;padding:3px 14px;font-size:.85rem;color:var(--muted);align-self:center}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:99px;padding:6px 14px;cursor:pointer;transition:all .2s}
+.chip.on{background:linear-gradient(135deg,var(--c1),var(--c2));border-color:transparent;color:#fff;transform:scale(1.04)}
+.chip.sm{padding:2px 10px;font-size:.85rem;cursor:default}
+.step{display:flex;align-items:center;gap:14px;justify-content:center}
+.step b{font-size:1.6rem;min-width:44px;text-align:center}
+.step button{width:42px;height:42px;border-radius:14px;border:0;background:var(--panel2);font-size:1.3rem;cursor:pointer}
+.step button:disabled{opacity:.3}
+.sw{display:flex;align-items:center;gap:12px;cursor:pointer;padding:6px 2px}
+.sw input{appearance:none;width:46px;height:26px;border-radius:99px;background:var(--panel2);position:relative;transition:.25s;flex:none;cursor:pointer}
+.sw input::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.25s}
+.sw input:checked{background:linear-gradient(135deg,var(--c1),var(--c2))}.sw input:checked::after{left:23px}
+.prow{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.pname{flex:1;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:14px;padding:11px 14px;color:var(--text);font:inherit;outline:0;min-width:0}
+.pname:focus{border-color:var(--c2)}
+.x{width:38px;height:38px;border:0;border-radius:12px;background:var(--panel);cursor:pointer}.x:disabled{opacity:.2}
+.av{--h:200;width:38px;height:38px;border-radius:50%;flex:none;display:inline-flex;align-items:center;justify-content:center;font-weight:700;background:hsl(var(--h) 70% 45%);color:#fff;box-shadow:inset 0 -4px 8px rgba(0,0,0,.2)}
+.av.xl{width:84px;height:84px;font-size:2.4rem}
+/* flip card */
+.flip{perspective:1100px;width:100%;min-height:330px;cursor:pointer}
+.flip.single{view-transition-name:pcard}
+.flip .in{position:relative;width:100%;min-height:inherit;height:100%;transition:transform .8s cubic-bezier(.3,1.25,.4,1);transform-style:preserve-3d}
+.flip.on .in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center;box-shadow:0 24px 60px -20px rgba(0,0,0,.6)}
+.face.front{background:linear-gradient(145deg,var(--c1),var(--c2));color:#fff}
+.face.back{background:#14172f;border:2px solid var(--c2);transform:rotateY(180deg)}
+.rc-ico{font-size:64px;line-height:1.1}.rc-big{font-size:2rem;font-weight:700;line-height:1.2;word-break:break-word}.rc-sub{color:var(--muted)}.rc-top{color:var(--muted);font-size:.95rem}
+.bad{color:var(--bad)}.good{color:var(--good)}
+.flip.mini{min-height:130px}.flip.mini .face{padding:8px;border-radius:18px;gap:2px}.flip.mini .rc-ico{font-size:34px}.flip.mini .rc-big{font-size:1rem}.flip.mini .rc-sub{font-size:.78rem}
+.minis{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;width:100%}
+.picks{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.pick{display:flex;align-items:center;gap:10px;border:2px solid var(--line);background:var(--panel);border-radius:18px;padding:10px;cursor:pointer;text-align:left;transition:all .2s;min-width:0}
+.pick span:last-child{overflow:hidden;text-overflow:ellipsis}
+.pick:hover{border-color:var(--c2)}.pick.sel{border-color:var(--c2);background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(0,212,255,.25));transform:scale(1.03)}
+.pick.wide{grid-column:1/-1;justify-content:center;text-align:center}
+.list{gap:6px}.lrow{display:flex;align-items:center;gap:10px;padding:4px 0}.lrow .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lrow.dead{opacity:.5}.lrow.dead .nm{text-decoration:line-through}
+.tag{font-size:.8rem;padding:2px 10px;border-radius:99px;background:var(--panel2)}.tag.r{background:rgba(255,84,112,.25);color:#ff9bab}.tag.g{background:rgba(61,220,151,.22);color:#8ff0c3}.tag.y{background:rgba(255,200,80,.22);color:#ffd98a}
+.rescard{view-transition-name:pcard;min-height:330px;width:100%;border-radius:28px;background:#14172f;border:2px solid var(--c2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center;animation:pop .6s cubic-bezier(.3,1.4,.4,1) both}
+.bigemo{font-size:80px;animation:pop .8s cubic-bezier(.3,1.6,.4,1) both}
+@keyframes pop{from{transform:scale(0) rotate(-40deg)}}
+/* timer */
+.timer{position:relative;width:170px;height:170px}.timer svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer circle{fill:none;stroke-width:7;stroke-linecap:round}.tr{stroke:var(--panel2)}.tp{stroke:var(--c2);transition:stroke-dashoffset 1s linear}
+.tt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.2rem;font-weight:700}
+/* score */
+.sbar{height:10px;border-radius:99px;background:linear-gradient(90deg,var(--c1),var(--c2));transition:width 1s cubic-bezier(.2,.9,.2,1);width:0}
+.srow{display:grid;grid-template-columns:90px 1fr 70px;gap:10px;align-items:center;font-size:.95rem}.srow .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.srow .p{text-align:right}
+.delta{font-size:.75rem;color:var(--good)}
+/* sudoku */
+.sd{display:grid;grid-template-columns:repeat(9,1fr);grid-template-rows:repeat(9,1fr);width:100%;max-width:480px;aspect-ratio:1;margin:0 auto;border:3px solid rgba(255,255,255,.55);border-radius:14px;overflow:hidden;background:#12152d}
+.sd .c{display:flex;align-items:center;justify-content:center;font-size:clamp(18px,6vw,30px);border:1px solid rgba(255,255,255,.08);cursor:pointer;position:relative;color:var(--c2);transition:background .15s;min-width:0}
+.sd .c.br{border-right:2px solid rgba(255,255,255,.5)}.sd .c.bb{border-bottom:2px solid rgba(255,255,255,.5)}
+.sd .c.g{color:#fff;font-weight:700}.sd .c.peer{background:rgba(255,255,255,.07)}.sd .c.same{background:rgba(124,92,255,.38)}
+.sd .c.sel{background:var(--c1);color:#fff}.sd .c.err{color:#ff6b84;background:rgba(255,84,112,.2)}
+.sd .c.pop{animation:cpop .3s}
+@keyframes cpop{50%{transform:scale(1.25)}}
+.nt{position:absolute;inset:1px;display:grid;grid-template-columns:repeat(3,1fr);font-size:clamp(7px,2vw,11px);line-height:1;color:var(--muted)}.nt i{font-style:normal;display:flex;align-items:center;justify-content:center}
+.np{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;max-width:480px;margin:0 auto;width:100%}
+.np button{border:0;border-radius:12px;background:var(--panel2);padding:8px 0 4px;font-size:1.3rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.1;transition:transform .12s}
+.np button:active{transform:scale(.9)}.np button small{font-size:.6rem;color:var(--muted);font-weight:400}.np button:disabled{opacity:.2}
+.tools{display:flex;gap:8px;max-width:480px;margin:0 auto;width:100%}.tools button{flex:1;padding:10px 4px;border:0;border-radius:14px;background:var(--panel2);cursor:pointer;font-size:.9rem}.tools button.on{background:linear-gradient(135deg,var(--c1),var(--c2))}
+.hud{display:flex;justify-content:space-between;align-items:center;max-width:480px;margin:0 auto;width:100%;font-weight:600}
+/* arrows */
+.arwrap{width:100%;max-width:520px;aspect-ratio:1;margin:0 auto;background:#10132b;border-radius:22px;overflow:hidden;border:1px solid var(--line);position:relative}
+.arsvg{width:100%;height:100%;display:block;touch-action:manipulation}
+.arr{cursor:pointer;transition:transform .7s cubic-bezier(.55,0,.85,.45),opacity .7s}
+.arr .body{fill:none;stroke:var(--c);stroke-width:.26;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}
+.arr .tip{fill:var(--c);transition:fill .2s}.arr .hit{fill:none;stroke:transparent;stroke-width:.85;stroke-linecap:round;stroke-linejoin:round}
+.arr.out{transform:translate(calc(var(--dx)*var(--far)*1px),calc(var(--dy)*var(--far)*1px));opacity:0;pointer-events:none}
+.arr.nudge{animation:nudge .5s}.arr.warn .body{stroke:var(--bad)}.arr.warn .tip{fill:var(--bad)}
+.arr.hint{animation:hint .7s ease-in-out 4}
+@keyframes nudge{30%{transform:translate(calc(var(--dx)*.4px),calc(var(--dy)*.4px))}55%{transform:translate(calc(var(--dx)*-.12px),calc(var(--dy)*-.12px))}}
+@keyframes hint{50%{filter:drop-shadow(0 0 .4px #fff) brightness(1.6)}}
+.ov{position:absolute;inset:0;background:rgba(8,10,25,.82);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;animation:fadeup .4s both;padding:20px;text-align:center}
+.hearts{letter-spacing:3px;font-size:1.3rem}
+/* misc */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.confetti i{position:absolute;top:-16px;width:9px;height:15px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--x),110vh) rotate(900deg)}}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#fff;color:#111;border-radius:99px;padding:10px 20px;z-index:70;animation:fadeup .3s both;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+#morph{position:fixed;inset:0;z-index:40;display:none;pointer-events:all;background-repeat:no-repeat}
+#micon{position:fixed;z-index:41;display:none;align-items:center;justify-content:center;pointer-events:none;transform-origin:0 0;filter:drop-shadow(0 6px 8px rgba(0,0,0,.25))}
+dialog{border:1px solid var(--line);border-radius:24px;background:#14172f;color:var(--text);max-width:480px;width:calc(100% - 28px);padding:22px;font:inherit}
+dialog::backdrop{background:rgba(5,6,16,.7);backdrop-filter:blur(5px)}
+dialog[open]{animation:dlg .35s cubic-bezier(.2,1.2,.3,1)}
+@keyframes dlg{from{opacity:0;transform:scale(.85) translateY(30px)}}
+dialog h3{font-size:1.3rem;margin-bottom:8px}dialog ul{padding-left:20px;margin:8px 0 16px}dialog li{margin:4px 0}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="bg"><div class="blob a"></div><div class="blob b"></div><div class="blob c"></div></div>
+
+<main id="home">
+  <div class="hero"><div class="logo">🎲</div><h1>খেলাঘর</h1><p>একটা ফোনেই বন্ধুদের সাথে খেলুন — পাস-অ্যান্ড-প্লে গেমের আসর</p></div>
+  <div class="grid" id="grid"></div>
+  <div class="foot">একটি ফাইল • ইন্টারনেট ছাড়াও চলে • কোনো ডেটা সার্ভারে যায় না</div>
+</main>
+
+<section id="game">
+  <header class="ghead"><button class="ib" id="back" aria-label="ফিরে যাও">←</button><span id="gicon"></span><h2 id="gtitle"></h2><button class="ib" id="rulesBtn" aria-label="নিয়ম">?</button></header>
+  <div id="gbody"></div>
+</section>
+
+<div id="morph"></div><div id="micon"></div>
+<dialog id="dlg"><div id="dbody"></div><button class="btn big" id="dclose">বুঝেছি 👍</button></dialog>
+
+<script>
+'use strict';
+/* ================= helpers ================= */
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[rnd(a.length)];
+const bn=n=>String(n).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ch=n=>[...String(n)][0]||'?';
+const hue=i=>(i*47+210)%360;
+const fmt=s=>bn(Math.floor(s/60))+':'+bn(String(s%60).padStart(2,'0'));
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const store={get(k,d){try{const v=localStorage.getItem('kg_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('kg_'+k,JSON.stringify(v))}catch(e){}}};
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const HASVT=!!document.startViewTransition;
+document.documentElement.classList.toggle('novt',!HASVT||RM);
+let AC;function beep(f=660,d=.18,t='sine'){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.value=.07;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
+const vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
+function confetti(){const b=document.createElement('div');b.className='confetti';const c=['#ff5f6d','#ffc371','#3ddc97','#00d4ff','#7c5cff','#ffd93d'];for(let i=0;i<70;i++){const s=document.createElement('i');s.style.cssText=`left:${Math.random()*100}%;background:${pick(c)};animation-delay:${Math.random()*.6}s;animation-duration:${1.8+Math.random()*1.6}s;--x:${(Math.random()-.5)*240}px`;b.appendChild(s)}document.body.appendChild(b);setTimeout(()=>b.remove(),4200)}
+
+/* ================= core: render / transitions ================= */
+const home=$('#home'),game=$('#game'),gbody=$('#gbody');
+let ACT={},REDRAW=null,LEAVE=null,KEY=null,CUR=null,TM=null,busy=false;
+const BASE={
+  padd(){P.names.push('');store.set('names',P.names);REDRAW&&REDRAW()},
+  pdel(t){P.names.splice(+t.dataset.i,1);store.set('names',P.names);REDRAW&&REDRAW()},
+  home(){closeGame()}
+};
+const useACT=o=>{ACT=Object.assign({},BASE,o)};
+function swap(fn){stopTimer();if(HASVT&&!RM){try{document.startViewTransition(fn);return}catch(e){}}fn()}
+function render(html,after){swap(()=>{gbody.innerHTML=html;scrollTo(0,0);after&&after()})}
+function renderNow(html,after){stopTimer();gbody.innerHTML=html;after&&after()}
+gbody.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t||t.disabled)return;const f=ACT[t.dataset.a];if(f)f(t,e)});
+gbody.addEventListener('input',e=>{if(e.target.classList.contains('pname')){P.names[+e.target.dataset.i]=e.target.value;store.set('names',P.names)}});
+addEventListener('keydown',e=>{if(KEY&&!(e.target.tagName==='INPUT'))KEY(e)});
+
+/* timer */
+function stopTimer(){clearInterval(TM);TM=null}
+function timerHTML(sec){return `<div class="timer"><svg viewBox="0 0 100 100"><circle class="tr" cx="50" cy="50" r="44"/><circle class="tp" id="ring" cx="50" cy="50" r="44" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"/></svg><div class="tt" id="tt">${fmt(sec)}</div></div><div class="row"><button class="btn ghost" id="tpause" data-a="tpause">⏸ থামাও</button><button class="btn ghost" data-a="tadd">＋৩০ সেকেন্ড</button></div>`}
+function bindTimer(sec,onEnd){
+  let left=sec,total=sec,paused=false;
+  const upd=()=>{const tt=$('#tt');if(!tt){stopTimer();return}tt.textContent=fmt(left);$('#ring').style.strokeDashoffset=100*(1-left/total)};
+  Object.assign(ACT,{tpause(t){paused=!paused;t.textContent=paused?'▶ চালাও':'⏸ থামাও'},tadd(){left+=30;total=Math.max(total,left);upd()}});
+  stopTimer();TM=setInterval(()=>{if(paused)return;left--;upd();if(left<=0){stopTimer();beep(880,.5,'square');vib([200,100,200]);onEnd&&onEnd()}},1000);upd();
+}
+
+/* players */
+const P={names:store.get('names',null)||['','','','','','']};
+function ensurePlayers(min,max){while(P.names.length<min)P.names.push('');if(P.names.length>max)P.names.length=max}
+function curNames(){const seen={};return P.names.map((n,i)=>{let s=n.trim()||('খেলোয়াড় '+bn(i+1));if(seen[s])s+=' '+bn(i+1);seen[s]=1;return s})}
+function playersHTML(min,max){const n=P.names.length;return `<div class="card"><div class="lbl">খেলোয়াড় (${bn(n)} জন${min===max?'':` • ${bn(min)}–${bn(max)}`})</div><div>${P.names.map((v,i)=>`<div class="prow"><span class="av" style="--h:${hue(i)}">${bn(i+1)}</span><input class="pname" data-i="${i}" placeholder="খেলোয়াড় ${bn(i+1)}" value="${esc(v)}" maxlength="14" autocomplete="off"><button class="x" data-a="pdel" data-i="${i}" ${n<=min?'disabled':''}>✕</button></div>`).join('')}</div>${min===max?'':`<button class="btn ghost" data-a="padd" ${n>=max?'disabled':''}>＋ খেলোয়াড় যোগ করো</button>`}</div>`}
+const stepper=(k,v,min,max)=>`<div class="step"><button data-a="st" data-k="${k}" data-d="-1" ${v<=min?'disabled':''}>−</button><b>${bn(v)}</b><button data-a="st" data-k="${k}" data-d="1" ${v>=max?'disabled':''}>＋</button></div>`;
+
+/* pass-and-play reveal */
+function revealFlow(names,contentFn,done){
+  let i=0;
+  const show=()=>{
+    render(`<div class="stack center"><div class="pill">${bn(i+1)} / ${bn(names.length)}</div>
+    <div class="flip single" data-a="flip"><div class="in">
+      <div class="face front"><span class="av xl" style="--h:${hue(i)}">${esc(ch(names[i]))}</span><h2>${esc(names[i])}</h2><p>ডিভাইস হাতে নাও, অন্যরা চোখ সরাও।<br><b>ছুঁয়ে উল্টাও 👆</b></p></div>
+      <div class="face back">${contentFn(i)}</div></div></div>
+    <button class="btn big" id="nxt" data-a="rvnext" disabled>${i<names.length-1?'লুকাও → পরের জন':'লুকাও → শুরু করো'}</button></div>`);
+  };
+  useACT({flip(t){if(!t.classList.contains('on')){t.classList.add('on');beep(520,.12);$('#nxt').disabled=false}},rvnext(t){$('.flip').classList.remove('on');t.disabled=true;setTimeout(()=>{i++;i<names.length?show():done()},480)}});
+  show();
+}
+function finalScreen({emoji,title,sub,rows,extra='',again}){
+  ACT=Object.assign({},BASE,{again});
+  render(`<div class="stack center"><div class="bigemo">${emoji}</div><h1 class="glow">${title}</h1><p class="muted">${sub}</p>${extra}<div class="card list">${rows.map(r=>`<div class="lrow ${r.dead?'dead':''}"><span class="av" style="--h:${hue(r.i)}">${esc(ch(r.name))}</span><span class="nm">${esc(r.name)}</span><span class="tag ${r.cls||''}">${r.tag}</span></div>`).join('')}</div><div class="row"><button class="btn big" data-a="again">🔁 আবার খেলুন</button><button class="btn ghost big" data-a="home">🏠 মেনু</button></div></div>`,confetti);
+}
+
+/* generic elimination engine (Imposter / Mr. White) */
+function elim(cfg){
+  const {names,roles}=cfg;let alive=names.map((_,i)=>i),round=1;
+  const E={alive:()=>alive,
+    counts:()=>({good:alive.filter(i=>!cfg.bad(roles[i])).length,bad:alive.filter(i=>cfg.bad(roles[i])).length}),
+    next(){const c=E.counts();if(c.bad===0)return cfg.end('good',E);if(c.good<=c.bad)return cfg.end('bad',E);round++;discuss()}};
+  const chips=()=>`<div class="chips" style="justify-content:center">${alive.map(i=>`<span class="chip sm">${esc(names[i])}</span>`).join('')}</div>`;
+  function discuss(){
+    const st=names[pick(cfg.starters?cfg.starters(alive):alive)];
+    useACT({vote});
+    render(`<div class="stack center"><div class="pill">রাউন্ড ${bn(round)}</div><h2>🗣 আলোচনা</h2><p>প্রথমে বলবে <b>${esc(st)}</b>, তারপর ঘড়ির কাঁটার দিকে।<br><span class="muted">${cfg.hint}</span></p>${chips()}${timerHTML(cfg.time)}<button class="btn big" data-a="vote">🗳 ভোটের সময়</button></div>`,()=>bindTimer(cfg.time));
+  }
+  function vote(){
+    useACT({pickv(t){eliminate(+t.dataset.i)},skip(){round++;discuss()}});
+    render(`<div class="stack"><h2 class="center">কাকে বাদ দেবে?</h2><p class="center muted">আলোচনার পর সবচেয়ে বেশি ভোট পাওয়া জনকে বেছে নাও</p><div class="picks">${alive.map(i=>`<button class="pick" data-a="pickv" data-i="${i}"><span class="av" style="--h:${hue(i)}">${esc(ch(names[i]))}</span><span>${esc(names[i])}</span></button>`).join('')}</div><button class="btn ghost" data-a="skip">টাই — কেউ বাদ নয়</button></div>`);
+  }
+  function eliminate(i){
+    alive=alive.filter(x=>x!==i);const L=cfg.label(roles[i]);
+    useACT({cont(){cfg.afterElim(i,E)}});
+    render(`<div class="stack center"><div class="pill">বাদ পড়ল…</div><div class="flip single"><div class="in"><div class="face front"><span class="av xl" style="--h:${hue(i)}">${esc(ch(names[i]))}</span><h2>${esc(names[i])}</h2><p>আসলে কী ছিল?…</p></div><div class="face back"><div class="rc-ico">${L.e}</div><div class="rc-big ${L.c||''}">${L.t}</div><div class="rc-sub">${esc(names[i])}</div></div></div></div><button class="btn big" data-a="cont">এগিয়ে চলো →</button></div>`,()=>setTimeout(()=>{const f=$('.flip');f&&f.classList.add('on');beep(300,.3,'triangle')},800));
+  }
+  E.start=discuss;E.names=names;E.roles=roles;return E;
+}
+
+/* ================= GAME 1: IMPOSTER ================= */
+const WORDS={
+'খাবার':['বিরিয়ানি','কাচ্চি','ভর্তা','পান্তা ইলিশ','ফুচকা','চটপটি','হালিম','রসগোল্লা','মিষ্টি দই','খিচুড়ি','শুঁটকি','পিঠা','সমুচা','মোরগ পোলাও','তেহারি','বাকরখানি'],
+'জায়গা':['কক্সবাজার','সুন্দরবন','সাজেক','লালবাগ কেল্লা','শহীদ মিনার','সংসদ ভবন','কমলাপুর স্টেশন','নিউ মার্কেট','সেন্ট মার্টিন','রাঙামাটি','জাদুঘর','হাসপাতাল','স্কুল','চা বাগান','লঞ্চঘাট','বিমানবন্দর'],
+'পশুপাখি':['রয়েল বেঙ্গল টাইগার','ময়না','দোয়েল','ইলিশ','কুমির','হাতি','কাক','কবুতর','গরু','ছাগল','বিড়াল','টিয়া','শিয়াল','বানর','ডলফিন'],
+'পেশা':['রিকশাচালক','ডাক্তার','শিক্ষক','পুলিশ','দর্জি','কৃষক','মাঝি','বাবুর্চি','ক্রিকেটার','পাইলট','জেলে','নাপিত','ফেরিওয়ালা','সাংবাদিক'],
+'জিনিস':['ছাতা','হারিকেন','পাখা','জুতা','মোবাইল','লুঙ্গি','গামছা','রিকশা','সাইকেল','চশমা','তালা','কলম','আয়না','হাতপাখা','মশারি'],
+'খেলা ও বিনোদন':['ক্রিকেট','ফুটবল','কাবাডি','লুডু','ক্যারাম','ঘুড়ি','দাবা','গোল্লাছুট','নৌকাবাইচ','সিনেমা','বইমেলা','যাত্রাপালা'],
+'উৎসব':['পহেলা বৈশাখ','ঈদ','দুর্গাপূজা','বিজয় দিবস','একুশে ফেব্রুয়ারি','বিয়ে','গায়ে হলুদ','নবান্ন','বড়দিন','বুদ্ধ পূর্ণিমা']};
+function gImposter(){
+  const S={imp:1,cats:new Set(['খাবার','জায়গা','পশুপাখি']),hint:true,time:120};
+  const maxImp=()=>Math.max(1,Math.floor((P.names.length-1)/3));
+  const setup=()=>{
+    ensurePlayers(3,12);S.imp=Math.min(Math.max(1,S.imp),maxImp());
+    renderNow(`<div class="stack">${playersHTML(3,12)}
+    <div class="card"><div class="lbl">ইম্পোস্টার সংখ্যা</div>${stepper('imp',S.imp,1,maxImp())}</div>
+    <div class="card"><div class="lbl">ক্যাটাগরি</div><div class="chips">${Object.keys(WORDS).map(c=>`<button class="chip ${S.cats.has(c)?'on':''}" data-a="cat" data-v="${c}">${c}</button>`).join('')}</div></div>
+    <div class="card"><div class="lbl">আলোচনার সময়</div><div class="chips">${[60,120,180,300].map(t=>`<button class="chip ${S.time==t?'on':''}" data-a="time" data-v="${t}">${fmt(t)}</button>`).join('')}</div>
+    <label class="sw"><input type="checkbox" data-a="hint" ${S.hint?'checked':''}><span>ইম্পোস্টারকে ক্যাটাগরির ইঙ্গিত দাও</span></label></div>
+    <button class="btn big" data-a="go">🎮 খেলা শুরু</button></div>`);
+    gbody.classList.remove('enter');
+  };
+  REDRAW=setup;
+  const start=()=>{
+    if(!S.cats.size)return toast('কমপক্ষে একটি ক্যাটাগরি বেছে নাও');
+    const names=curNames(),cat=pick([...S.cats]),word=pick(WORDS[cat]);
+    const imps=new Set(shuffle(names.map((_,i)=>i)).slice(0,S.imp));
+    revealFlow(names,i=>imps.has(i)?`<div class="rc-ico">🕵️</div><div class="rc-big bad">তুমি ইম্পোস্টার!</div><div class="rc-sub">${S.hint?'ইঙ্গিত — ক্যাটাগরি: <b>'+cat+'</b>':'শব্দ জানো না — ধরা না পড়ে মিশে যাও'}</div>`:`<div class="rc-top">তোমার শব্দ</div><div class="rc-big">${word}</div><div class="rc-sub">ক্যাটাগরি: ${cat}</div>`,()=>{
+      const endFn=(win,E)=>{
+        const rows=names.map((n,i)=>({i,name:n,dead:!E.alive().includes(i),tag:imps.has(i)?'🕵️ ইম্পোস্টার':'🙂 সাধারণ',cls:imps.has(i)?'r':'g'}));
+        finalScreen({emoji:win==='good'?'🎉':'🕵️',title:win==='good'?'সাধারণরা জিতেছে!':'ইম্পোস্টার জিতেছে!',sub:`শব্দ ছিল: <b>${word}</b> (${cat})`,rows,again:setup});
+      };
+      const guess=E=>{
+        const opts=shuffle([word,...shuffle(WORDS[cat].filter(w=>w!==word)).slice(0,5)]);
+        useACT({g(t){endFn(t.dataset.w===word?'bad':'good',E)}});
+        render(`<div class="stack center"><div class="bigemo">🎯</div><h2>ইম্পোস্টারের শেষ সুযোগ!</h2><p class="muted">ধরা পড়েছে — এখন সঠিক শব্দটা অনুমান করতে পারলে সে-ই জিতবে।</p><div class="picks">${opts.map(w=>`<button class="pick wide" data-a="g" data-w="${esc(w)}">${w}</button>`).join('')}</div></div>`);
+      };
+      const E=elim({names,roles:names.map((_,i)=>imps.has(i)?'imp':'civ'),time:S.time,bad:r=>r==='imp',
+        label:r=>r==='imp'?{t:'ইম্পোস্টার ছিল!',e:'🕵️',c:'bad'}:{t:'সাধারণ খেলোয়াড়',e:'🙂',c:'good'},
+        hint:'প্রত্যেকে শব্দটা না বলে এক বাক্যে ইঙ্গিত দাও। ইম্পোস্টার ধরা পড়ে এমন কিছু বলো, কিন্তু বেশি ফাঁস কোরো না!',
+        afterElim(i,E){const c=E.counts();if(imps.has(i)&&c.bad===0)return guess(E);E.next()},
+        end:endFn});
+      E.start();
+    });
+  };
+  useACT({
+    cat(t){const v=t.dataset.v;S.cats.has(v)?S.cats.delete(v):S.cats.add(v);setup()},
+    time(t){S.time=+t.dataset.v;setup()},
+    hint(t){S.hint=t.checked},
+    st(t){S[t.dataset.k]+=+t.dataset.d;setup()},
+    go:start});
+  setup();
+}
+
+/* ================= GAME 2: MR. WHITE ================= */
+const PAIRS=[['চা','কফি'],['ইলিশ','রুই'],['রিকশা','সিএনজি'],['বিরিয়ানি','তেহারি'],['ফুচকা','চটপটি'],['আম','লিচু'],['ক্রিকেট','ফুটবল'],['শার্ট','পাঞ্জাবি'],['লুঙ্গি','ধুতি'],['নদী','খাল'],['বই','খাতা'],['পুলিশ','আনসার'],['ডাক্তার','নার্স'],['বাস','ট্রেন'],['কলম','পেনসিল'],['রসগোল্লা','চমচম'],['হারিকেন','মোমবাতি'],['ফেসবুক','ইউটিউব'],['মোবাইল','ল্যাপটপ'],['সিনেমা','নাটক'],['বৃষ্টি','বন্যা'],['চাঁদ','সূর্য'],['পাখা','এসি'],['দোকান','বাজার'],['স্কুল','কলেজ'],['চা-স্টল','রেস্টুরেন্ট'],['নৌকা','লঞ্চ'],['দুধ','দই'],['কাক','কবুতর'],['গিটার','হারমোনিয়াম']];
+function gMrWhite(){
+  const S={und:1,white:true};
+  const lim=()=>{const n=P.names.length,w=S.white?1:0;const max=Math.max(S.white?0:1,Math.floor((n-1)/2)-w);return{min:S.white?0:1,max}};
+  const setup=()=>{
+    ensurePlayers(3,12);const L=lim();S.und=Math.min(Math.max(L.min,S.und),L.max);
+    if(!S.white&&S.und<1)S.und=1;
+    const civ=P.names.length-S.und-(S.white?1:0);
+    renderNow(`<div class="stack">${playersHTML(3,12)}
+    <div class="card"><div class="lbl">আন্ডারকভার (ভিন্ন শব্দ পাবে)</div>${stepper('und',S.und,L.min,L.max)}
+    <label class="sw"><input type="checkbox" data-a="white" ${S.white?'checked':''}><span>👻 মিস্টার হোয়াইট থাকবে (কোনো শব্দ পাবে না)</span></label>
+    <p class="muted">সাধারণ খেলোয়াড়: <b>${bn(civ)}</b> • আন্ডারকভার: <b>${bn(S.und)}</b> • মিস্টার হোয়াইট: <b>${S.white?'১':'০'}</b></p></div>
+    <button class="btn big" data-a="go">🎮 খেলা শুরু</button></div>`);
+  };
+  REDRAW=setup;
+  const start=()=>{
+    const names=curNames(),n=names.length;let pair=pick(PAIRS);if(Math.random()<.5)pair=[pair[1],pair[0]];
+    const roles=shuffle([...Array(S.und).fill('und'),...(S.white?['white']:[]),...Array(n-S.und-(S.white?1:0)).fill('civ')]);
+    revealFlow(names,i=>roles[i]==='white'?`<div class="rc-ico">👻</div><div class="rc-big">তুমি মিস্টার হোয়াইট!</div><div class="rc-sub">তোমার কোনো শব্দ নেই। অন্যদের কথা শুনে আন্দাজ করো, ধরা না পড়ে মিশে যাও।</div>`:`<div class="rc-top">তোমার শব্দ</div><div class="rc-big">${roles[i]==='civ'?pair[0]:pair[1]}</div><div class="rc-sub">শব্দটা কাউকে বলবে না!</div>`,()=>{
+      const T={civ:['🙂 সাধারণ','g'],und:['🥸 আন্ডারকভার','r'],white:['👻 মিস্টার হোয়াইট','y']};
+      const endFn=(win,E)=>{
+        const rows=names.map((nm,i)=>({i,name:nm,dead:!E.alive().includes(i),tag:T[roles[i]][0],cls:T[roles[i]][1]}));
+        finalScreen({emoji:win==='good'?'🎉':win==='white'?'👻':'🥸',title:win==='good'?'সাধারণরা জিতেছে!':win==='white'?'মিস্টার হোয়াইট জিতেছে!':'আন্ডারকভার দল জিতেছে!',sub:`সাধারণদের শব্দ: <b>${pair[0]}</b> • আন্ডারকভারের শব্দ: <b>${pair[1]}</b>`,rows,again:setup});
+      };
+      const wGuess=E=>{
+        useACT({show(t){t.outerHTML=`<div class="rc-big">${pair[0]}</div>`},ok(){endFn('white',E)},no(){E.next()}});
+        render(`<div class="stack center"><div class="bigemo">👻</div><h2>মিস্টার হোয়াইটের শেষ সুযোগ!</h2><p class="muted">ধরা পড়েছে! এখন সাধারণদের শব্দটা ঠিক বলতে পারলে সে একাই জিতবে। সে জোরে বলুক, সাধারণ খেলোয়াড়রা বিচার করো।</p><button class="btn ghost" data-a="show">👁 আসল শব্দ দেখো (শুধু সাধারণরা)</button><div class="row"><button class="btn" data-a="ok">✅ সঠিক বলেছে</button><button class="btn ghost" data-a="no">❌ ভুল</button></div></div>`);
+      };
+      const E=elim({names,roles,time:120,bad:r=>r!=='civ',
+        starters:al=>{const x=al.filter(i=>roles[i]!=='white');return x.length?x:al},
+        label:r=>({civ:{t:'সাধারণ খেলোয়াড়',e:'🙂',c:'good'},und:{t:'আন্ডারকভার ছিল!',e:'🥸',c:'bad'},white:{t:'মিস্টার হোয়াইট!',e:'👻',c:'bad'}})[r],
+        hint:'প্রত্যেকে নিজের শব্দ নিয়ে একটা ইঙ্গিত দাও — শব্দটা সরাসরি বলা যাবে না।',
+        afterElim(i,E){if(roles[i]==='white')return wGuess(E);E.next()},
+        end:endFn});
+      E.start();
+    });
+  };
+  useACT({white(t){S.white=t.checked;setup()},st(t){S[t.dataset.k]+=+t.dataset.d;setup()},go:start});
+  setup();
+}
+
+/* ================= GAME 3: SUDOKU ================= */
+function sudSolve(g,limit,rand){
+  const R=Array(9).fill(0),C=Array(9).fill(0),B=Array(9).fill(0);
+  for(let i=0;i<81;i++)if(g[i]){const b=1<<(g[i]-1);R[(i/9)|0]|=b;C[i%9]|=b;B[((i/27)|0)*3+(((i%9)/3)|0)]|=b}
+  let count=0;const pc=m=>{let n=0;while(m){m&=m-1;n++}return n};
+  const rec=()=>{
+    let best=-1,bm=0,bc=10;
+    for(let i=0;i<81;i++){if(!g[i]){const r=(i/9)|0,c=i%9,b=((r/3)|0)*3+((c/3)|0);const m=~(R[r]|C[c]|B[b])&511;const n=pc(m);if(n<bc){bc=n;best=i;bm=m;if(n<2)break}}}
+    if(best<0){count++;return rand?true:count>=limit}
+    if(!bc)return false;
+    const r=(best/9)|0,c=best%9,b=((r/3)|0)*3+((c/3)|0);let ds=[];for(let d=0;d<9;d++)if(bm&(1<<d))ds.push(d);if(rand)ds=shuffle(ds);
+    for(const d of ds){const bit=1<<d;g[best]=d+1;R[r]|=bit;C[c]|=bit;B[b]|=bit;if(rec())return true;g[best]=0;R[r]&=~bit;C[c]&=~bit;B[b]&=~bit}
+    return false;
+  };
+  rec();return count;
+}
+function sudGen(diff){
+  const sol=Array(81).fill(0);sudSolve(sol,1,true);
+  const puz=sol.slice(),target={easy:42,medium:34,hard:29,expert:25}[diff];let clues=81;
+  for(const i of shuffle([...Array(81).keys()])){if(clues<=target)break;const v=puz[i];puz[i]=0;if(sudSolve(puz.slice(),2,false)!==1)puz[i]=v;else clues--}
+  return{puz,sol};
+}
+const PEERS=Array.from({length:81},(_,i)=>{const r=(i/9)|0,c=i%9,s=new Set();for(let k=0;k<9;k++){s.add(r*9+k);s.add(k*9+c)}const br=r-r%3,bc=c-c%3;for(let a=0;a<3;a++)for(let b=0;b<3;b++)s.add((br+a)*9+bc+b);s.delete(i);return[...s]});
+function gSudoku(){
+  const DN={easy:'সহজ',medium:'মাঝারি',hard:'কঠিন',expert:'বিশেষজ্ঞ'};
+  let diff=store.get('sd_diff','medium'),G=null,GT=null;
+  LEAVE=()=>{clearInterval(GT);KEY=null};
+  const best=()=>store.get('sd_best',{});
+  const menu=()=>{
+    clearInterval(GT);KEY=null;const b=best();
+    renderNow(`<div class="stack center"><div class="bigemo">🔢</div><h2>সুডোকু</h2><p class="muted">প্রতিটি ধাঁধার সমাধান একটাই — অনুমান নয়, যুক্তি দিয়ে মেলাও!</p>
+    <div class="card"><div class="lbl">কঠিনতা</div><div class="chips">${Object.keys(DN).map(k=>`<button class="chip ${diff===k?'on':''}" data-a="diff" data-v="${k}">${DN[k]}</button>`).join('')}</div>
+    <p class="muted">সেরা সময় (${DN[diff]}): <b>${b[diff]?fmt(b[diff]):'—'}</b></p></div>
+    <button class="btn big" data-a="new">🎮 নতুন খেলা</button></div>`);
+    useACT({diff(t){diff=t.dataset.v;store.set('sd_diff',diff);menu()},new:newGame});
+  };
+  REDRAW=menu;
+  const newGame=()=>{
+    renderNow(`<div class="stack center"><div class="bigemo">⏳</div><h2>ধাঁধা তৈরি হচ্ছে…</h2></div>`);
+    setTimeout(()=>{const {puz,sol}=sudGen(diff);G={puz,sol,val:puz.slice(),given:puz.map(v=>v>0),notes:Array(81).fill(0),sel:-1,nm:false,mist:0,hints:0,secs:0,hist:[]};play()},40);
+  };
+  const conflict=i=>{const v=G.val[i];return v&&PEERS[i].some(j=>G.val[j]===v)};
+  const board=()=>{
+    const sv=G.sel>=0?G.val[G.sel]:0,sp=G.sel>=0?new Set(PEERS[G.sel]):null;let h='';
+    for(let i=0;i<81;i++){const r=(i/9)|0,c=i%9,v=G.val[i];
+      const cl=['c',G.given[i]?'g':'',c%3===2&&c<8?'br':'',r%3===2&&r<8?'bb':'',i===G.sel?'sel':'',sp&&sp.has(i)?'peer':'',sv&&v===sv&&i!==G.sel?'same':'',v&&!G.given[i]&&(conflict(i)||v!==G.sol[i])?'err':''].join(' ');
+      let inner=v||'';if(!v&&G.notes[i]){inner=`<div class="nt">${[1,2,3,4,5,6,7,8,9].map(d=>`<i>${G.notes[i]&(1<<(d-1))?d:''}</i>`).join('')}</div>`}
+      h+=`<div class="${cl}" data-a="cell" data-i="${i}">${inner}</div>`}
+    return h;
+  };
+  const pad=()=>{const cnt=Array(10).fill(0);G.val.forEach(v=>cnt[v]++);return[1,2,3,4,5,6,7,8,9].map(d=>`<button data-a="num" data-d="${d}" ${cnt[d]>=9?'disabled':''}>${d}<small>${9-cnt[d]}</small></button>`).join('')};
+  const hudTxt=()=>`⏱ ${fmt(G.secs)}`;
+  const refresh=()=>{$('#sdb').innerHTML=board();$('#sdp').innerHTML=pad();$('#sdm').textContent='❌ '+bn(G.mist);$('#sdn').classList.toggle('on',G.nm)};
+  const play=()=>{
+    useACT({cell(t){G.sel=+t.dataset.i;refresh()},num(t){enter(+t.dataset.d)},erase,undo,hint,notes(){G.nm=!G.nm;refresh()},menu,
+      newg:()=>{if(confirm('বর্তমান খেলা ছেড়ে নতুন খেলা শুরু করবে?'))menu()}});
+    renderNow(`<div class="stack"><div class="hud"><span id="sdt">${hudTxt()}</span><span class="pill">${DN[diff]}</span><span id="sdm">❌ ০</span></div>
+    <div class="sd" id="sdb"></div>
+    <div class="tools"><button data-a="undo">↩ আনডু</button><button data-a="erase">⌫ মোছো</button><button id="sdn" data-a="notes">✏️ নোট</button><button data-a="hint">💡 ইঙ্গিত</button></div>
+    <div class="np" id="sdp"></div><button class="btn ghost" data-a="newg">☰ মেনু</button></div>`,()=>{refresh();gbody.classList.add('enter');setTimeout(()=>gbody.classList.remove('enter'),700)});
+    clearInterval(GT);GT=setInterval(()=>{G.secs++;const e=$('#sdt');if(e)e.textContent=hudTxt()},1000);
+    KEY=e=>{
+      if(e.key>='1'&&e.key<='9')enter(+e.key);else if(['Backspace','Delete','0'].includes(e.key))erase();
+      else if(e.key==='n'||e.key==='N'){G.nm=!G.nm;refresh()}
+      else if(e.key.startsWith('Arrow')){e.preventDefault();let s=G.sel<0?40:G.sel,r=(s/9)|0,c=s%9;if(e.key==='ArrowUp')r=(r+8)%9;if(e.key==='ArrowDown')r=(r+1)%9;if(e.key==='ArrowLeft')c=(c+8)%9;if(e.key==='ArrowRight')c=(c+1)%9;G.sel=r*9+c;refresh()}
+      else if((e.ctrlKey||e.metaKey)&&e.key==='z')undo();
+    };
+  };
+  const snap=()=>{G.hist.push({v:G.val.slice(),n:G.notes.slice(),m:G.mist});if(G.hist.length>300)G.hist.shift()};
+  const enter=d=>{
+    const i=G.sel;if(i<0||G.given[i])return;
+    if(G.nm){if(G.val[i])return;snap();G.notes[i]^=1<<(d-1);refresh();return}
+    snap();
+    if(G.val[i]===d){G.val[i]=0;refresh();return}
+    G.val[i]=d;G.notes[i]=0;PEERS[i].forEach(j=>{G.notes[j]&=~(1<<(d-1))});
+    if(d!==G.sol[i]){G.mist++;vib(120);beep(200,.2,'sawtooth')}else beep(660,.08);
+    refresh();const el=$(`[data-i="${i}"]`);el&&el.classList.add('pop');
+    if(G.val.every((v,k)=>v===G.sol[k]))win();
+  };
+  const erase=()=>{const i=G.sel;if(i<0||G.given[i])return;snap();G.val[i]=0;G.notes[i]=0;refresh()};
+  const undo=()=>{const h=G.hist.pop();if(!h)return;G.val=h.v;G.notes=h.n;refresh()};
+  const hint=()=>{
+    let i=G.sel;if(i<0||G.given[i]||G.val[i]===G.sol[i]){const c=[];G.val.forEach((v,k)=>{if(v!==G.sol[k])c.push(k)});if(!c.length)return;i=pick(c)}
+    snap();G.sel=i;G.val[i]=G.sol[i];G.notes[i]=0;G.given[i]=true;G.hints++;PEERS[i].forEach(j=>{G.notes[j]&=~(1<<(G.sol[i]-1))});refresh();toast('💡 ইঙ্গিত দেওয়া হল');
+    if(G.val.every((v,k)=>v===G.sol[k]))win();
+  };
+  const win=()=>{
+    clearInterval(GT);KEY=null;const b=best();const rec=!b[diff]||G.secs<b[diff]&&G.hints===0;if(G.hints===0&&(!b[diff]||G.secs<b[diff])){b[diff]=G.secs;store.set('sd_best',b)}
+    useACT({again:menu});
+    render(`<div class="stack center"><div class="bigemo">🏆</div><h1 class="glow">অভিনন্দন!</h1><p class="muted">${DN[diff]} সুডোকু সমাধান হয়ে গেছে</p><div class="card"><div class="srow" style="grid-template-columns:1fr auto"><span>⏱ সময়</span><b>${fmt(G.secs)}</b></div><div class="srow" style="grid-template-columns:1fr auto"><span>❌ ভুল</span><b>${bn(G.mist)}</b></div><div class="srow" style="grid-template-columns:1fr auto"><span>💡 ইঙ্গিত</span><b>${bn(G.hints)}</b></div></div><div class="row"><button class="btn big" data-a="again">🔁 আরেকটা</button><button class="btn ghost big" data-a="home">🏠 মেনু</button></div></div>`,confetti);
+  };
+  menu();
+}
+
+/* ================= GAME 4: ARROWS ================= */
+function arGen(n){
+  const dirs=[[1,0],[-1,0],[0,1],[0,-1]],maxLen=Math.min(7,3+Math.floor(n/2));
+  let best=null;
+  for(let tries=0;tries<25;tries++){
+    const occ=new Map(),arrows=[];let fails=0;const limit=n*n*25;
+    while(fails<limit){
+      const sx=rnd(n),sy=rnd(n);if(occ.has(sy*n+sx)){fails++;continue}
+      const len=2+rnd(maxLen-1);const path=[[sx,sy]],inP=new Set([sy*n+sx]);let last=null;
+      for(let k=1;k<len;k++){
+        const[cx,cy]=path[path.length-1];
+        const o=dirs.filter(([dx,dy])=>{const x=cx+dx,y=cy+dy;return x>=0&&y>=0&&x<n&&y<n&&!occ.has(y*n+x)&&!inP.has(y*n+x)});
+        if(!o.length)break;
+        const d=last&&Math.random()<.5&&o.some(q=>q[0]===last[0]&&q[1]===last[1])?last:pick(o);
+        path.push([cx+d[0],cy+d[1]]);inP.add((cy+d[1])*n+cx+d[0]);last=d;
+      }
+      if(path.length<2){fails++;continue}
+      const[hx,hy]=path[path.length-1];let x=hx+last[0],y=hy+last[1],ok=true;
+      while(x>=0&&y>=0&&x<n&&y<n){const k=y*n+x;if(occ.has(k)||inP.has(k)){ok=false;break}x+=last[0];y+=last[1]}
+      if(!ok){fails++;continue}
+      const id=arrows.length;path.forEach(([px,py])=>occ.set(py*n+px,id));arrows.push({id,cells:path,dir:last,gone:false});
+    }
+    // blocked count
+    const blocked=arrows.filter(a=>{const[hx,hy]=a.cells[a.cells.length-1];let x=hx+a.dir[0],y=hy+a.dir[1];while(x>=0&&y>=0&&x<n&&y<n){if(occ.has(y*n+x))return true;x+=a.dir[0];y+=a.dir[1]}return false}).length;
+    if(!best||arrows.length+blocked>best.score)best={arrows,score:arrows.length+blocked};
+    if(arrows.length>=n*n/4&&blocked>=arrows.length*.4)return arrows;
+  }
+  return best.arrows;
+}
+function gArrows(){
+  let level=store.get('ar_level',1),A=null,locked=false;
+  LEAVE=()=>{};
+  const HUES=[190,330,45,150,265,15,95,215];
+  const size=()=>Math.min(5+Math.floor((level-1)/2),11);
+  const owner=()=>{const m=new Map();A.arrows.forEach(a=>{if(!a.gone)a.cells.forEach(([x,y])=>m.set(y*A.n+x,a.id))});return m};
+  const blockerOf=a=>{const m=owner(),[hx,hy]=a.cells[a.cells.length-1];let x=hx+a.dir[0],y=hy+a.dir[1];while(x>=0&&y>=0&&x<A.n&&y<A.n){const o=m.get(y*A.n+x);if(o!==undefined)return o;x+=a.dir[0];y+=a.dir[1]}return -1};
+  const remaining=()=>A.arrows.filter(a=>!a.gone).length;
+  const svg=()=>{
+    const n=A.n;let s=`<svg class="arsvg" viewBox="-.15 -.15 ${n+.3} ${n+.3}" style="--far:${n+4}">`;
+    for(let y=0;y<n;y++)for(let x=0;x<n;x++)s+=`<circle cx="${x+.5}" cy="${y+.5}" r=".045" fill="rgba(255,255,255,.14)"/>`;
+    A.arrows.forEach(a=>{
+      const pts=a.cells.map(([x,y])=>`${x+.5},${y+.5}`).join(' ');const[hx,hy]=a.cells[a.cells.length-1].map(v=>v+.5),[dx,dy]=a.dir,px=-dy,py=dx;
+      const tip=`${hx+dx*.46},${hy+dy*.46} ${hx-dx*.1+px*.3},${hy-dy*.1+py*.3} ${hx-dx*.1-px*.3},${hy-dy*.1-py*.3}`;
+      s+=`<g class="arr ${a.gone?'out':''}" id="ar${a.id}" data-a="tap" data-id="${a.id}" style="--c:hsl(${HUES[a.id%HUES.length]} 85% 62%);--dx:${dx};--dy:${dy}"><polyline class="hit" points="${pts}"/><polyline class="body" points="${pts}"/><polygon class="tip" points="${tip}"/></g>`;
+    });
+    return s+'</svg>';
+  };
+  const hearts=()=>'❤️'.repeat(A.lives)+'🖤'.repeat(3-A.lives);
+  const hud=()=>{$('#arl').innerHTML=hearts();$('#arr').textContent='🏹 বাকি '+bn(remaining())};
+  const load=(fresh=true)=>{
+    if(fresh){const n=size();A={n,arrows:arGen(n),lives:3,moves:0}}else{A.arrows.forEach(a=>a.gone=false);A.lives=3;A.moves=0}
+    locked=false;
+    useACT({tap(t){tap(+t.dataset.id)},hint,again:()=>{load(false)},fresh:()=>load(true),next(){level++;store.set('ar_level',level);load(true)},reset(){level=1;store.set('ar_level',1);load(true)}});
+    render(`<div class="stack"><div class="hud"><span class="pill">লেভেল ${bn(level)} • ${bn(A.n)}×${bn(A.n)}</span><span class="hearts" id="arl"></span><span id="arr"></span></div>
+    <div class="arwrap" id="arw">${svg()}</div>
+    <p class="center muted">তীরে ট্যাপ করো — সামনের পথ ফাঁকা থাকলে তীর বেরিয়ে যাবে। সব তীর সরাও!</p>
+    <div class="row"><button class="btn ghost" data-a="hint">💡 ইঙ্গিত</button><button class="btn ghost" data-a="again">↺ রিসেট</button><button class="btn ghost" data-a="fresh">🔀 নতুন</button></div></div>`,hud);
+  };
+  const tap=id=>{
+    if(locked)return;const a=A.arrows[id];if(a.gone)return;const el=$('#ar'+id),b=blockerOf(a);
+    if(b<0){a.gone=true;A.moves++;el.classList.add('out');beep(520+Math.min(remaining(),20)*18,.12);hud();if(!remaining())setTimeout(win,650)}
+    else{
+      A.lives--;vib(80);beep(180,.2,'sawtooth');el.classList.remove('hint');el.classList.add('nudge');const be=$('#ar'+b);be.classList.add('warn');
+      setTimeout(()=>{el.classList.remove('nudge');be.classList.remove('warn')},550);hud();if(A.lives<=0){locked=true;setTimeout(lose,500)}
+    }
+  };
+  const hint=()=>{const f=A.arrows.filter(a=>!a.gone&&blockerOf(a)<0);if(!f.length)return;const el=$('#ar'+pick(f).id);el.classList.add('hint');setTimeout(()=>el.classList.remove('hint'),3000)};
+  const overlay=html=>{const w=$('#arw');if(w)w.insertAdjacentHTML('beforeend',`<div class="ov">${html}</div>`)};
+  const win=()=>{locked=true;confetti();beep(880,.3);overlay(`<div class="bigemo">🎉</div><h2>লেভেল ${bn(level)} পার!</h2><p class="muted">${bn(A.moves)}টি চালে • ${bn(A.lives)}টি জীবন বাকি</p><button class="btn big" data-a="next">পরের লেভেল →</button>`)};
+  const lose=()=>{overlay(`<div class="bigemo">💔</div><h2>জীবন শেষ!</h2><p class="muted">তীরগুলো আটকে গেছে। আবার চেষ্টা করো।</p><button class="btn big" data-a="again">↺ আবার চেষ্টা</button><button class="btn ghost" data-a="fresh">🔀 নতুন ধাঁধা</button>`)};
+  load(true);
+}
+
+/* ================= GAME 5: CHOR-POLICE (Bangladesh rules) ================= */
+const TR={babu:{n:'বাবু (বড় দরগা)',e:'🎩',p:1000},police:{n:'পুলিশ',e:'👮',p:800},dakat:{n:'ডাকাত',e:'🦹',p:500},jutachor:{n:'জুতাচোর',e:'👞',p:300},chor:{n:'চোর',e:'🥷',p:0}};
+function gThief(){
+  const S={rounds:5};let names,scores,round,roles,idx;
+  const setup=()=>{
+    ensurePlayers(5,5);
+    renderNow(`<div class="stack">${playersHTML(5,5)}
+    <div class="card"><div class="lbl">কত রাউন্ড?</div><div class="chips">${[3,5,7,10].map(r=>`<button class="chip ${S.rounds===r?'on':''}" data-a="rounds" data-v="${r}">${bn(r)} রাউন্ড</button>`).join('')}</div></div>
+    <div class="card"><div class="lbl">চিরকুট ও পয়েন্ট</div>${Object.keys(TR).map(k=>`<div class="lrow"><span style="font-size:1.4rem">${TR[k].e}</span><span class="nm">${TR[k].n}</span><span class="tag">${bn(TR[k].p)}</span></div>`).join('')}</div>
+    <button class="btn big" data-a="go">🎮 খেলা শুরু</button></div>`);
+  };
+  REDRAW=setup;
+  const startAll=()=>{names=curNames();scores=names.map(()=>0);round=1;play()};
+  const play=()=>{
+    const keys=shuffle(Object.keys(TR));roles=names.map((_,i)=>keys[i]);idx=k=>roles.indexOf(k);
+    revealFlow(names,i=>{const r=TR[roles[i]];return `<div class="rc-ico">${r.e}</div><div class="rc-big">${r.n}</div><div class="rc-sub">${roles[i]==='babu'?'নিজেকে ঘোষণা করার পালা এলে বলবে!':roles[i]==='police'?'ঘোষণার পালা এলে বলবে। তোমার কাজ চোর ধরা!':'পরিচয় গোপন রাখো। পুলিশ যেন তোমাকে চোর না ভাবে!'}</div><div class="tag" style="margin-top:6px">${bn(r.p)} পয়েন্ট</div>`},()=>stage(0));
+  };
+  const big=(front,backIco,backTxt,backSub)=>`<div class="flip single"><div class="in"><div class="face front"><div class="rc-ico">❓</div><h2>${front}</h2></div><div class="face back"><div class="rc-ico">${backIco}</div><div class="rc-big">${backTxt}</div><div class="rc-sub">${backSub}</div></div></div></div>`;
+  const autoFlip=()=>setTimeout(()=>{const f=$('.flip');f&&f.classList.add('on');beep(600,.15)},900);
+  const stage=n=>{
+    if(n===0){useACT({n(){stage(1)}});render(`<div class="stack center"><div class="pill">রাউন্ড ${bn(round)} / ${bn(S.rounds)}</div><h2>🎩 বাবু কে?</h2>${big('বাবু কে?','🎩',esc(names[idx('babu')]),'আমি বাবু! — "পুলিশ, চোরকে ধরো!"')}<button class="btn big" data-a="n">👮 পুলিশ কে? →</button></div>`,autoFlip)}
+    if(n===1){useACT({n(){stage(2)}});render(`<div class="stack center"><div class="pill">রাউন্ড ${bn(round)} / ${bn(S.rounds)}</div><h2>👮 পুলিশ কে?</h2>${big('পুলিশ কে?','👮',esc(names[idx('police')]),'হুজুর, আমি চোর ধরব!')}<button class="btn big" data-a="n">🔍 চোর খোঁজা শুরু →</button></div>`,autoFlip)}
+    if(n===2){
+      const sus=names.map((_,i)=>i).filter(i=>!['babu','police'].includes(roles[i]));
+      useACT({sus(t){result(+t.dataset.i)}});
+      render(`<div class="stack center"><div class="pill">রাউন্ড ${bn(round)} / ${bn(S.rounds)}</div><div class="bigemo">🔍</div><h2>পুলিশ ${esc(names[idx('police')])}, চোর কে?</h2><p class="muted">বাকি তিনজনের মধ্যে একজন চোর, একজন ডাকাত, একজন জুতাচোর। সবাই নিজেকে নির্দোষ দাবি করবে!</p><div class="picks">${sus.map(i=>`<button class="pick" data-a="sus" data-i="${i}"><span class="av" style="--h:${hue(i)}">${esc(ch(names[i]))}</span><span>${esc(names[i])}</span></button>`).join('')}</div></div>`);
+    }
+  };
+  const result=g=>{
+    const ok=roles[g]==='chor',pts=names.map((_,i)=>TR[roles[i]].p),d=pts.slice();
+    if(!ok){d[idx('police')]=0;d[idx('chor')]=TR.police.p}
+    d.forEach((v,i)=>scores[i]+=v);const last=round>=S.rounds;
+    useACT({next(){round++;play()},fin:final,again:startAll});
+    const max=Math.max(...scores,1);
+    render(`<div class="stack center"><div class="pill">রাউন্ড ${bn(round)} / ${bn(S.rounds)}</div><div class="bigemo">${ok?'🎉':'😈'}</div><h2 class="${ok?'good':'bad'}">${ok?'পুলিশ চোর ধরেছে!':'পুলিশ ভুল লোক ধরেছে!'}</h2><p class="muted">${ok?`${esc(names[g])} ছিল চোর।`:`${esc(names[g])} চোর ছিল না — আসল চোর ${esc(names[idx('chor')])} পুলিশের পয়েন্ট নিয়ে পালাল!`}</p>
+    <div class="minis">${names.map((nm,i)=>`<div class="flip mini" data-r="${i}"><div class="in"><div class="face front"><div class="rc-ico">❓</div><div class="rc-sub">${esc(nm)}</div></div><div class="face back"><div class="rc-ico">${TR[roles[i]].e}</div><div class="rc-big">${TR[roles[i]].n.split(' ')[0]}</div><div class="rc-sub">${esc(nm)}</div></div></div></div>`).join('')}</div>
+    <div class="card" id="sc">${names.map((nm,i)=>`<div class="srow"><span class="n">${esc(nm)}</span><div><div class="sbar" data-w="${scores[i]/max*100}"></div></div><span class="p">${bn(scores[i])}<br><span class="delta">+${bn(d[i])}</span></span></div>`).join('')}</div>
+    <button class="btn big" data-a="${last?'fin':'next'}">${last?'🏆 ফলাফল':'পরের রাউন্ড →'}</button></div>`,()=>{
+      $$('.flip.mini').forEach((f,k)=>setTimeout(()=>f.classList.add('on'),500+k*350));
+      setTimeout(()=>$$('.sbar').forEach(b=>b.style.width=b.dataset.w+'%'),300);
+    });
+  };
+  const final=()=>{
+    const order=names.map((n,i)=>({n,i,s:scores[i]})).sort((a,b)=>b.s-a.s);
+    useACT({again:startAll});
+    render(`<div class="stack center"><div class="bigemo">🏆</div><h1 class="glow">${esc(order[0].n)} জিতেছে!</h1><p class="muted">${bn(S.rounds)} রাউন্ড শেষে</p><div class="card list">${order.map((o,k)=>`<div class="lrow"><span style="width:28px;font-size:1.3rem">${['🥇','🥈','🥉'][k]||bn(k+1)}</span><span class="av" style="--h:${hue(o.i)}">${esc(ch(o.n))}</span><span class="nm">${esc(o.n)}</span><span class="tag y">${bn(o.s)}</span></div>`).join('')}</div><div class="row"><button class="btn big" data-a="again">🔁 আবার</button><button class="btn ghost big" data-a="home">🏠 মেনু</button></div></div>`,confetti);
+  };
+  useACT({rounds(t){S.rounds=+t.dataset.v;setup()},go:startAll});
+  setup();
+}
+
+/* ================= GAME 6: MAFIA ================= */
+const MR={mafia:{n:'মাফিয়া',e:'🔪'},doctor:{n:'ডাক্তার',e:'🩺'},detective:{n:'ডিটেকটিভ',e:'🔎'},citizen:{n:'নাগরিক',e:'🙂'}};
+function gMafia(){
+  const S={maf:1};let M;
+  const maxMaf=()=>Math.max(1,Math.min(Math.floor((P.names.length-1)/2),P.names.length-3));
+  const setup=()=>{
+    ensurePlayers(5,15);S.maf=Math.min(Math.max(1,S.maf),maxMaf());const n=P.names.length;
+    renderNow(`<div class="stack">${playersHTML(5,15)}
+    <div class="card"><div class="lbl">মাফিয়া সংখ্যা</div>${stepper('maf',S.maf,1,maxMaf())}
+    <p class="muted">🔪 মাফিয়া ${bn(S.maf)} • 🩺 ডাক্তার ১ • 🔎 ডিটেকটিভ ১ • 🙂 নাগরিক ${bn(n-S.maf-2)}</p></div>
+    <div class="card"><p class="muted">কোনো গেম-মাস্টার লাগবে না! রাতে ডিভাইসটা হাতে হাতে ঘুরবে — প্রত্যেকে নিজের পালায় গোপনে কাজ করবে (নাগরিকরাও, যাতে কে কী তা বোঝা না যায়)।</p></div>
+    <button class="btn big" data-a="go">🎮 খেলা শুরু</button></div>`);
+  };
+  REDRAW=setup;
+  const start=()=>{
+    const names=curNames(),n=names.length;
+    const roles=shuffle([...Array(S.maf).fill('mafia'),'doctor','detective',...Array(n-S.maf-2).fill('citizen')]);
+    M={names,roles,alive:names.map((_,i)=>i),night:0,votes:{},save:-1};
+    revealFlow(names,i=>{const r=roles[i],m=MR[r];const mates=r==='mafia'?names.filter((_,j)=>roles[j]==='mafia'&&j!==i):[];
+      const sub={mafia:mates.length?`সহযোগী: <b>${mates.map(esc).join(', ')}</b>`:'তুমি একাই মাফিয়া!',doctor:'প্রতি রাতে একজনকে বাঁচাতে পারো',detective:'প্রতি রাতে একজনের আসল পরিচয় জানতে পারো',citizen:'আলোচনা করে মাফিয়া খুঁজে বের করো'}[r];
+      return `<div class="rc-ico">${m.e}</div><div class="rc-big ${r==='mafia'?'bad':''}">তুমি ${m.n}</div><div class="rc-sub">${sub}</div>`},night);
+  };
+  const win=()=>{
+    const maf=M.alive.filter(i=>M.roles[i]==='mafia').length,oth=M.alive.length-maf;
+    if(maf===0)return 'citizens';if(maf>=oth)return 'mafia';return null;
+  };
+  const endGame=w=>{
+    finalScreen({emoji:w==='citizens'?'🎉':'🔪',title:w==='citizens'?'নাগরিকরা জিতেছে!':'মাফিয়া জিতেছে!',sub:`${bn(M.night)} রাতের পর খেলা শেষ`,rows:M.names.map((n,i)=>({i,name:n,dead:!M.alive.includes(i),tag:MR[M.roles[i]].e+' '+MR[M.roles[i]].n,cls:M.roles[i]==='mafia'?'r':'g'})),again:setup});
+  };
+  const night=()=>{
+    M.night++;M.votes={};M.save=-1;M.order=shuffle(M.alive);M.oi=0;
+    useACT({go:actor});
+    render(`<div class="stack center"><div class="bigemo">🌙</div><h1 class="glow">রাত ${bn(M.night)}</h1><p class="muted">শহর ঘুমিয়ে পড়েছে। ডিভাইসটা এক এক করে ঘুরবে — নিজের পালায় গোপনে কাজ করো, তারপর পরের জনকে দাও। কেউ কারো স্ক্রিন দেখবে না!</p><div class="card"><div class="lbl">জীবিত (${bn(M.alive.length)})</div><div class="chips">${M.alive.map(i=>`<span class="chip sm">${esc(M.names[i])}</span>`).join('')}</div></div><button class="btn big" data-a="go">শুরু করো →</button></div>`);
+  };
+  const actor=()=>{
+    if(M.oi>=M.order.length)return morning();
+    const i=M.order[M.oi];
+    useACT({show:()=>action(i)});
+    render(`<div class="stack center"><div class="pill">${bn(M.oi+1)} / ${bn(M.order.length)}</div><div class="flip single"><div class="in"><div class="face front" style="background:linear-gradient(145deg,#2b2f5e,#12142b)"><span class="av xl" style="--h:${hue(i)}">${esc(ch(M.names[i]))}</span><h2>${esc(M.names[i])}</h2><p>ডিভাইসটা শুধু ${esc(M.names[i])}-এর হাতে দাও</p></div></div></div><button class="btn big" data-a="show">আমি ${esc(M.names[i])} — দেখাও</button></div>`);
+  };
+  const action=i=>{
+    const role=M.roles[i],al=M.alive;let t,d,ch_;M.sel=-1;
+    if(role==='mafia'){t='🔪 কাকে খুন করবে?';const mates=al.filter(j=>M.roles[j]==='mafia'&&j!==i);d=mates.length?`সহযোগীদের সাথে (${mates.map(j=>esc(M.names[j])).join(', ')}) আগে আলোচনা করে নাও — আলাদা আলাদা ভোট গণনা হবে।`:'শিকার বেছে নাও।';ch_=al.filter(j=>M.roles[j]!=='mafia')}
+    else if(role==='doctor'){t='🩺 কাকে বাঁচাবে?';d='নিজেকেও বাঁচাতে পারো।';ch_=al}
+    else if(role==='detective'){t='🔎 কাকে সন্দেহ করছ?';d='একজনকে বেছে নাও — জানবে সে মাফিয়া কিনা।';ch_=al.filter(j=>j!==i)}
+    else{t='😴 তুমি সাধারণ নাগরিক';d='সবার সময় সমান রাখতে একজনকে মনে মনে সন্দেহ করো (এতে খেলায় কোনো প্রভাব পড়বে না)।';ch_=al.filter(j=>j!==i)}
+    useACT({
+      mpick(el){M.sel=+el.dataset.i;$$('.pick').forEach(b=>b.classList.toggle('sel',b===el));$('#mc').disabled=false},
+      mok(){
+        const s=M.sel;let res;
+        if(role==='mafia')M.votes[s]=(M.votes[s]||0)+1;else if(role==='doctor')M.save=s;
+        if(role==='detective')res=`<div class="rc-ico">🔎</div><div class="rc-big ${M.roles[s]==='mafia'?'bad':'good'}">${esc(M.names[s])} ${M.roles[s]==='mafia'?'মাফিয়া! 🔪':'মাফিয়া নয় ✅'}</div><div class="rc-sub">মনে রাখো, কাউকে দেখিয়ো না</div>`;
+        else res=`<div class="rc-ico">🤫</div><div class="rc-big">কাজ শেষ</div><div class="rc-sub">ডিভাইস রেখে ঘুমিয়ে পড়ো…</div>`;
+        useACT({done(){M.oi++;actor()}});
+        render(`<div class="stack center"><div class="rescard">${res}</div><button class="btn big" data-a="done">লুকাও → ডিভাইস পরের জনকে দাও</button></div>`);
+      }});
+    render(`<div class="stack center"><h2>${t}</h2><p class="muted">${d}</p><div class="picks">${ch_.map(j=>`<button class="pick" data-a="mpick" data-i="${j}"><span class="av" style="--h:${hue(j)}">${esc(ch(M.names[j]))}</span><span>${esc(M.names[j])}</span></button>`).join('')}</div><button class="btn big" id="mc" data-a="mok" disabled>✔ নিশ্চিত</button></div>`);
+  };
+  const morning=()=>{
+    let mx=0,tg=[];for(const k in M.votes){if(M.votes[k]>mx){mx=M.votes[k];tg=[+k]}else if(M.votes[k]===mx)tg.push(+k)}
+    const target=pick(tg);let died=-1;if(target!==M.save){died=target;M.alive=M.alive.filter(x=>x!==died)}
+    const w=win();
+    useACT({go(){w?endGame(w):day()}});
+    render(`<div class="stack center"><div class="bigemo">☀️</div><h1 class="glow">সকাল হল</h1>${died<0?`<div class="card"><div class="rc-ico">😮</div><h2>রাতে কেউ মারা যায়নি!</h2><p class="muted">মাফিয়ার চেষ্টা ব্যর্থ — কেউ কি বাঁচিয়ে দিল?</p></div>`:`<div class="flip single"><div class="in"><div class="face front"><div class="rc-ico">💀</div><h2>${esc(M.names[died])}</h2><p>রাতে খুন হয়েছে…</p></div><div class="face back"><div class="rc-ico">${MR[M.roles[died]].e}</div><div class="rc-big">${MR[M.roles[died]].n}</div><div class="rc-sub">${esc(M.names[died])} ছিল</div></div></div></div>`}<button class="btn big" data-a="go">${w?'ফলাফল দেখো':'আলোচনা শুরু →'}</button></div>`,()=>setTimeout(()=>{const f=$('.flip');f&&f.classList.add('on');beep(180,.4,'triangle')},900));
+  };
+  const day=()=>{
+    useACT({vote});
+    render(`<div class="stack center"><div class="pill">দিন ${bn(M.night)}</div><h2>🗣 আলোচনা</h2><p class="muted">কে মাফিয়া? যুক্তি দাও, সন্দেহ করো, নিজেকে বাঁচাও!</p><div class="chips" style="justify-content:center">${M.alive.map(i=>`<span class="chip sm">${esc(M.names[i])}</span>`).join('')}</div>${timerHTML(180)}<button class="btn big" data-a="vote">🗳 ভোটের সময়</button></div>`,()=>bindTimer(180));
+  };
+  const vote=()=>{
+    const cnt={};M.alive.forEach(i=>cnt[i]=0);
+    useACT({vp(t){const i=t.dataset.i;cnt[i]++;$('#vc'+i).textContent=bn(cnt[i])},vm(t){const i=t.dataset.i;if(cnt[i]>0)cnt[i]--;$('#vc'+i).textContent=bn(cnt[i])},res(){
+      let mx=0,tg=[];for(const k in cnt){if(cnt[k]>mx){mx=cnt[k];tg=[+k]}else if(cnt[k]===mx&&mx>0)tg.push(+k)}
+      if(mx===0||tg.length!==1){useACT({go:night});return render(`<div class="stack center"><div class="bigemo">🤝</div><h2>টাই! কেউ বাদ পড়ল না</h2><p class="muted">রাত নামছে…</p><button class="btn big" data-a="go">🌙 রাত শুরু</button></div>`)}
+      const e=tg[0];M.alive=M.alive.filter(x=>x!==e);const w=win();useACT({go(){w?endGame(w):night()}});
+      render(`<div class="stack center"><div class="pill">${bn(mx)} ভোট</div><div class="flip single"><div class="in"><div class="face front"><span class="av xl" style="--h:${hue(e)}">${esc(ch(M.names[e]))}</span><h2>${esc(M.names[e])}</h2><p>বাদ পড়েছে…</p></div><div class="face back"><div class="rc-ico">${MR[M.roles[e]].e}</div><div class="rc-big ${M.roles[e]==='mafia'?'good':'bad'}">${MR[M.roles[e]].n}</div><div class="rc-sub">${esc(M.names[e])} ছিল</div></div></div></div><button class="btn big" data-a="go">${w?'ফলাফল দেখো':'🌙 রাত শুরু'}</button></div>`,()=>setTimeout(()=>{const f=$('.flip');f&&f.classList.add('on');beep(300,.3,'triangle')},800));
+    }});
+    render(`<div class="stack"><h2 class="center">🗳 ভোট গণনা</h2><p class="center muted">প্রত্যেকের হাত তুলে ভোট দেওয়া গুনে + চাপো</p>${M.alive.map(i=>`<div class="card" style="flex-direction:row;align-items:center"><span class="av" style="--h:${hue(i)}">${esc(ch(M.names[i]))}</span><span class="nm" style="flex:1">${esc(M.names[i])}</span><div class="step"><button data-a="vm" data-i="${i}">−</button><b id="vc${i}">০</b><button data-a="vp" data-i="${i}">＋</button></div></div>`).join('')}<button class="btn big" data-a="res">ফলাফল →</button></div>`);
+  };
+  useACT({st(t){S[t.dataset.k]+=+t.dataset.d;setup()},go:start});
+  setup();
+}
+
+/* ================= registry, home, morph ================= */
+const GAMES=[
+{id:'imposter',name:'ইম্পোস্টার',icon:'🕵️',c:['#ff5f6d','#ff9966'],desc:'সবাই একই শব্দ জানে — শুধু একজন জানে না!',pl:'৩–১২ জন',start:gImposter,rules:['সবাই গোপনে একটা শব্দ দেখবে। ইম্পোস্টার শব্দটা জানবে না (শুধু ক্যাটাগরি পাবে)।','আলোচনায় প্রত্যেকে এক বাক্যে ইঙ্গিত দেবে — শব্দ সরাসরি বলা যাবে না।','ইম্পোস্টার ধরা না পড়ে মিশে যাবে, বাকিরা তাকে খুঁজবে।','ভোটে ধরা পড়লে ইম্পোস্টার শেষ সুযোগ পায় — শব্দ ঠিক অনুমান করলে সে-ই জিতবে।']},
+{id:'mrwhite',name:'মিস্টার হোয়াইট',icon:'👻',c:['#8e9eab','#5b86e5'],desc:'প্রায় একই শব্দ, একজনের কোনো শব্দই নেই!',pl:'৩–১২ জন',start:gMrWhite,rules:['সাধারণরা একটা শব্দ পাবে, আন্ডারকভাররা তার কাছাকাছি আরেকটা — কেউ জানে না সে কোন দলে।','মিস্টার হোয়াইট কোনো শব্দ পায় না, আন্দাজে চালিয়ে যায়।','প্রতি রাউন্ডে ইঙ্গিত দিয়ে আলোচনা, তারপর ভোটে একজন বাদ — তার আসল ভূমিকা দেখানো হয়।','মিস্টার হোয়াইট ধরা পড়লে সাধারণদের শব্দ ঠিক বললে সে একাই জিতে যায়।','সব আন্ডারকভার ও হোয়াইট বাদ পড়লে সাধারণরা জেতে; ওরা সংখ্যায় সমান হলে ওরা জেতে।']},
+{id:'sudoku',name:'সুডোকু',icon:'🔢',c:['#11998e','#38ef7d'],desc:'যুক্তির ধাঁধা — প্রতিটির সমাধান একটাই।',pl:'একা',start:gSudoku,rules:['প্রতিটি সারি, কলাম ও ৩×৩ বাক্সে ১–৯ ঠিক একবার করে বসাতে হবে।','ঘর বেছে নিচের নম্বর চাপো। নোট মোডে ছোট ছোট সম্ভাব্য সংখ্যা লিখে রাখা যায়।','ভুল সংখ্যা লাল হয়ে যায় ও ভুলের হিসাবে যোগ হয়। কিবোর্ডের ১–৯, তীর, N কি-ও চলে।','ইঙ্গিত ছাড়া সমাধান করলে সেরা সময় সেভ হয়।']},
+{id:'arrows',name:'অ্যারো',icon:'🏹',c:['#f7971e','#ffd200'],desc:'তীর সরাও — তবে কারও পথ আটকে থাকলে সাবধান!',pl:'একা',start:gArrows,rules:['বোর্ডে অনেক তীর। তীরে ট্যাপ করলে সেটা মাথার দিকে সোজা বেরিয়ে যেতে চাইবে।','সামনে অন্য তীর থাকলে আটকে যায় আর একটা জীবন কমে (মোট ৩টি)।','সঠিক ক্রমে একে একে সব তীর সরাতে পারলে লেভেল পার। প্রতি লেভেলে বোর্ড বড় হয়।','আটকে গেলে 💡 ইঙ্গিত চাপলে একটা মুক্ত তীর জ্বলে উঠবে।']},
+{id:'thief',name:'চোর-পুলিশ',icon:'🎩',c:['#8e2de2','#ff5fa2'],desc:'বাবু, পুলিশ, ডাকাত, চোর, জুতাচোর — বাংলাদেশি নিয়মে!',pl:'৫ জন',start:gThief,rules:['৫ জন, ৫টি চিরকুট: বাবু (বড় দরগা) ১০০০, পুলিশ ৮০০, ডাকাত ৫০০, জুতাচোর ৩০০, চোর ০ পয়েন্ট।','সবাই গোপনে নিজের চিরকুট দেখে। তারপর বাবু ও পুলিশ নিজেদের প্রকাশ করে।','বাবু হুকুম দেয় — পুলিশ বাকি তিনজনের মধ্যে চোরকে খুঁজে বের করবে।','ঠিক ধরলে সবাই নিজ নিজ পয়েন্ট পায়। ভুল ধরলে পুলিশ ০ পায়, আর আসল চোর পুলিশের ৮০০ নিয়ে পালায়!','নির্দিষ্ট রাউন্ড শেষে সবচেয়ে বেশি পয়েন্ট যার, সে বিজয়ী।']},
+{id:'mafia',name:'মাফিয়া',icon:'🔪',c:['#1d2b64','#c31432'],desc:'রাতে খুন, দিনে বিচার — শহর কার দখলে?',pl:'৫–১৫ জন',start:gMafia,rules:['গোপনে ভূমিকা: মাফিয়া 🔪, ডাক্তার 🩺, ডিটেকটিভ 🔎 ও সাধারণ নাগরিক 🙂।','রাতে ডিভাইস হাতে হাতে ঘোরে: মাফিয়া খুন করে, ডাক্তার একজনকে বাঁচায়, ডিটেকটিভ একজনকে তদন্ত করে। নাগরিকরাও একটা নকল পালা পায়, যাতে ভূমিকা বোঝা না যায়।','সকালে কে মারা গেল জানা যায় (বাঁচলে কেউ না)। তারপর আলোচনা ও ভোট — একজন বাদ।','সব মাফিয়া শেষ হলে নাগরিকরা জেতে; মাফিয়া সংখ্যায় বাকিদের সমান হলে মাফিয়া জেতে।']}
+];
+const grid=$('#grid');
+grid.innerHTML=GAMES.map((g,i)=>`<button class="gcard" data-g="${g.id}" style="--c1:${g.c[0]};--c2:${g.c[1]};--i:${i}"><span class="cicon">${g.icon}</span><h3>${g.name}</h3><p>${g.desc}</p><span class="pl">👥 ${g.pl}</span></button>`).join('');
+grid.addEventListener('click',e=>{const c=e.target.closest('.gcard');if(c)openGame(GAMES.find(g=>g.id===c.dataset.g),c)});
+if(matchMedia('(hover:hover)').matches)$$('.gcard').forEach(c=>{c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect();c.style.setProperty('--ry',((e.clientX-r.left)/r.width-.5)*12+'deg');c.style.setProperty('--rx',-((e.clientY-r.top)/r.height-.5)*12+'deg')});c.addEventListener('pointerleave',()=>{c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg')})});
+
+const morph=$('#morph'),micon=$('#micon');
+const EASE='cubic-bezier(.7,0,.2,1)',DUR=650;
+const inset=r=>`inset(${r.top}px ${innerWidth-r.right}px ${innerHeight-r.bottom}px ${r.left}px round 26px)`;
+const gradOf=g=>`linear-gradient(145deg,${g.c[0]},${g.c[1]})`;
+let homeScroll=0;
+function setupScreen(g){
+  game.style.setProperty('--c1',g.c[0]);game.style.setProperty('--c2',g.c[1]);
+  $('#gtitle').textContent=g.name;$('#gicon').textContent=g.icon;
+  gbody.innerHTML='';ACT={};REDRAW=null;LEAVE=null;KEY=null;
+}
+async function openGame(g,card){
+  if(busy)return;busy=true;CUR=g;homeScroll=scrollY;
+  const r=card.getBoundingClientRect(),icon=card.querySelector('.cicon'),ir=icon.getBoundingClientRect();
+  setupScreen(g);
+  try{history.pushState({g:1},'')}catch(e){}
+  if(RM){home.style.display='none';game.classList.add('on','show');scrollTo(0,0);g.start();busy=false;return}
+  // overlay morph from card rect to full screen
+  morph.style.display='block';morph.style.backgroundImage=gradOf(g);morph.style.opacity=1;
+  micon.style.cssText=`display:flex;left:${ir.left}px;top:${ir.top}px;width:${ir.width}px;height:${ir.height}px;font-size:${getComputedStyle(icon).fontSize}`;micon.textContent=g.icon;
+  game.classList.add('on');scrollTo(0,0);g.start();
+  const gh=$('#gicon').getBoundingClientRect(),sc=gh.width/ir.width;
+  const bgFrom={backgroundSize:`${r.width}px ${r.height}px`,backgroundPosition:`${r.left}px ${r.top}px`},bgTo={backgroundSize:`${innerWidth}px ${innerHeight}px`,backgroundPosition:'0px 0px'};
+  micon.animate([{transform:'none'},{transform:`translate(${gh.left-ir.left}px,${gh.top-ir.top}px) scale(${sc})`}],{duration:DUR,easing:EASE,fill:'forwards'});
+  await morph.animate([{clipPath:inset(r),...bgFrom},{clipPath:'inset(0px 0px 0px 0px round 0px)',...bgTo}],{duration:DUR,easing:EASE,fill:'forwards'}).finished;
+  home.style.display='none';game.classList.add('show');gbody.classList.add('enter');
+  await Promise.all([morph.animate([{opacity:1},{opacity:0}],{duration:380,easing:'ease-out',fill:'forwards'}).finished,micon.animate([{opacity:1},{opacity:0}],{duration:380,fill:'forwards'}).finished]);
+  morph.style.display='none';micon.style.display='none';morph.getAnimations().forEach(a=>a.cancel());micon.getAnimations().forEach(a=>a.cancel());
+  setTimeout(()=>gbody.classList.remove('enter'),600);busy=false;
+}
+async function closeGame(fromPop){
+  if(busy||!CUR)return;busy=true;
+  if(!fromPop){try{if(history.state&&history.state.g)history.back()}catch(e){}}
+  const g=CUR;LEAVE&&LEAVE();stopTimer();KEY=null;
+  const gh=$('#gicon').getBoundingClientRect();
+  if(RM){game.classList.remove('on','show');home.style.display='';scrollTo(0,homeScroll);CUR=null;busy=false;return}
+  morph.style.display='block';morph.style.backgroundImage=gradOf(g);morph.style.backgroundSize=`${innerWidth}px ${innerHeight}px`;morph.style.backgroundPosition='0 0';morph.style.clipPath='inset(0px 0px 0px 0px round 0px)';
+  await morph.animate([{opacity:0},{opacity:1}],{duration:200,fill:'forwards'}).finished;
+  game.classList.remove('on','show');home.style.display='';scrollTo(0,homeScroll);
+  const card=$(`.gcard[data-g="${g.id}"]`),icon=card.querySelector('.cicon');
+  const r=card.getBoundingClientRect(),ir=icon.getBoundingClientRect();
+  micon.style.cssText=`display:flex;left:${ir.left}px;top:${ir.top}px;width:${ir.width}px;height:${ir.height}px;font-size:${getComputedStyle(icon).fontSize}`;micon.textContent=g.icon;
+  const sc=gh.width/ir.width;
+  micon.animate([{transform:`translate(${gh.left-ir.left}px,${gh.top-ir.top}px) scale(${sc})`},{transform:'none'}],{duration:DUR-100,easing:EASE,fill:'forwards'});
+  morph.getAnimations().forEach(a=>a.cancel());morph.style.opacity=1;
+  await morph.animate([{clipPath:'inset(0px 0px 0px 0px round 0px)',backgroundSize:`${innerWidth}px ${innerHeight}px`,backgroundPosition:'0px 0px'},{clipPath:inset(r),backgroundSize:`${r.width}px ${r.height}px`,backgroundPosition:`${r.left}px ${r.top}px`}],{duration:DUR-100,easing:EASE,fill:'forwards'}).finished;
+  await morph.animate([{opacity:1},{opacity:0}],{duration:220,fill:'forwards'}).finished;
+  morph.style.display='none';micon.style.display='none';morph.getAnimations().forEach(a=>a.cancel());micon.getAnimations().forEach(a=>a.cancel());
+  card.animate([{transform:'scale(.94)'},{transform:'scale(1)'}],{duration:350,easing:'cubic-bezier(.3,1.6,.4,1)'});
+  CUR=null;busy=false;
+}
+$('#back').addEventListener('click',()=>closeGame());
+addEventListener('popstate',()=>{if(CUR)closeGame(true)});
+const dlg=$('#dlg');
+$('#rulesBtn').addEventListener('click',()=>{if(!CUR)return;$('#dbody').innerHTML=`<h3>${CUR.icon} ${CUR.name} — নিয়ম</h3><ul>${CUR.rules.map(r=>`<li>${r}</li>`).join('')}</ul>`;dlg.style.setProperty('--c1',CUR.c[0]);dlg.style.setProperty('--c2',CUR.c[1]);dlg.showModal()});
+$('#dclose').addEventListener('click',()=>dlg.close());
+dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+</script>
+</body>
+</html>
